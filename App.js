@@ -1,239 +1,182 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import * as React from 'react';
+import { Text, View, StyleSheet,TouchableOpacity,Alert } from 'react-native';
+import Constants from 'expo-constants';
 
-class App2 extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      num: 0,
-    };
+
+export default class App extends React.Component {
+  constructor(){
+    super();
+    this.state={
+      gameState:[[0,0,0],
+      [0,0,0],
+      [0,0,0]],
+      turn:'-1',
+       results:"",
+       player:"",
+    }
+   }
+  reset(){
+    this.startgame();
   }
-  render() {
-    return (
-      <View style={{ paddingTop: 100 }}>
-        <Text style={stylesApp2.heading}>Class Based Component</Text>
-      </View>
+  startgame = () =>{
+    this.setState({
+      gameState:[[0,0,0],
+      [0,0,0],
+      [0,0,0]]
+    });
+  }
+  display = (row,col)=>{
+    var value=this.state.gameState[row][col];
+    if(value == -1){
+      return     <Text style={{fontSize:40}}>0</Text>;
+    
+    }
+    else if(value ===1){
+      return <Text style={{fontSize:40}}>*</Text>
+    }
+    else{
+      return <View></View>
+    }
+  }
+onboardpress=(row,col)=>{
+  var value=this.state.gameState[row][col];
+  if(value!==0){return;}
+
+
+
+  var cp=this.state.turn
+  var array=this.state.gameState.slice();
+  array[row][col]=cp;
+  this.setState(
+    {player:"Player1 turn"}
+  );
+
+  this.setState({gameState:array});
+
+  var cp1=(cp==1)? -1 : 1;
+  this.setState({turn:cp1});
+    this.setState(
+    {player:"Player2 turn"}
+  )
+
+
+  var win=this.winner();
+  if(win==1){
+    this.setState(
+      {results:"Player 1 wins"}
     );
+    this.startgame();
   }
-}
-const stylesApp2 = StyleSheet.create({
-  heading: {
-    fontSize: 20,
-    textAlign: 'center',
-  },
-});
-export default function App() {
-   
-   const [solution,setSolution] = useState('') ;
-   const [getugn, setugnn]=useState(Math.floor(Math.random()*100));
-   const [getsgn,setsgn]=useState('');
-   const [getresult,setresult]=useState('');
-   const [gethint,sethint]=useState('');
-   const [gethint1,sethint1]=useState('');
-   const [getcount,setcount]=useState(0);
-   const [getscore,setscore]=useState(0);
-   const [getturn,setturn]=useState(0);                    
-  const GAME_START_MESSAGE = 'Guess a Number';
-               
-  const [getNum, setNum] = useState(GAME_START_MESSAGE);
-
-  const numClick = (e) => {
-    // alert(1)
-    if (getNum === 0) setNum(e);
-    else setNum(getNum + '' + e);
-
-  };
+  else if(win ==-1){
+    this.setState(
+      {results:"Player 2 wins"}
+    );
+    this.startgame();
+  }
  
+}
+winner = () =>{
+  const n=3;
+  var sum;
+  var array=this.state.gameState
+  //FOR ROWS
+  for(var i =0;i<n;i++){
+    sum=array[i][0]+array[i][1]+array[i][2];
+    if(sum==3){
+      return 1
+    }
+    else if(sum==-3){
+      return -1;
+    }
     
- const onClick = button => {
-        var z= getugn
-        if(getcount===5){
-            sethint("You lost the game"),
-            setresult(z)   
-        }
-        else if(button === "CE"){
-          backspace()
-        }//NOW IF I CLICK CE BUTTON IT WILL DELETE VERY LAST DIGIT NUMBER   
-       
-        else if(button === "reset"){
-         // reset()
-        }//NOW IF I CLICK C BUTTON IT WILL RESET EVERYTHING
-         else if(button === "="){
-           calculate()
-           //TASK#01
-           var c=1;
-           c=getcount+1
-           setcount(c)
-           setturn(c)         
-        }//NOW IF I CLICK = BUTTON THE RESULT WILL BE DISPLAYED 
-        else if(button === "h"){
-          hint1()
-        }    
-        else {
-            setSolution(solution+button)
-                   
-         }//THIS IS EVENT LISTNER FOR EVERYOTHER BUTTON e.g 1, 2, 3, 4, 5,... etc
-      };
-      function hint1(){
-        var ugn=getugn;
-        var h=getugn;
-        var h1=h;
-        if(h<100){
-            h=h%5;
-            h+=2;
-            h-=2;
-            h+=ugn;
-            h1=h;
-            h1=ugn-5;
-            var z ="Range is "+h1+" and "+h
-            sethint1(z);
-            setscore(getscore-2);
-        }
-      }   
-      //THIS ARROW FUNCTION WILL BE INVOLVE IN CALCULATING CORRECT RESULTS
-     const calculate = () => {
-        console.log(getugn)
-        var sgn=solution;
-        var ugn=getugn;
-        console.log(ugn,sgn)
-        var s=getscore
-        if(ugn==sgn){
-          setresult("Correct. You won!!")
-          setscore(getscore+5)
-          setturn(getturn+5)
-          setSolution("")
-          setugnn(Math.floor(Math.random()*100))
-        }
-        else{
-          setresult("Wrong Guess");
-          setSolution("");
-        }
-      };
-  
-      const backspace=()=>{
-
-      }
-      const buttonClick=(e)=>{
-        e.preventDefault();
-        this.setState({button:e.target.name, countClick:this.state.countClick+1});
-      } 
-      
-      //THIS WILL SET THE STATE OF THE INPUT TEXT TO EMPTY STRING
-      //TASK#03
-     const  reset = () => {
-       setSolution("");
-       setcount(0);
-       sethint("");
-       sethint1("");
-       setresult("");
-       setscore(0);
-       setsgn(0);
-       setugnn(Math.floor(Math.random()*100));
-       setturn(0);
-      };
-
-  const message = (
-    <View>
-      <Text style={{ textAlign: 'center', fontSize: 20 }}>Welcome to Number Guessing Game</Text>
-      <Button title="Start Game" onPress={() => setNum(0)} />
-    </View>
-  );
-  const end = (
-    <View>
-    <Text style={{ textAlign: 'center', fontSize: 20 }}>Game ended</Text>
-    <Text style={{ textAlign: 'center', fontSize: 20 }}>Your score is {getscore}</Text>
-    
-      <Button title="Finish" onPress={() => {
-        setNum(GAME_START_MESSAGE);
-        reset();
-      }} />
-    <Button title="Play Again" onPress={() => {
-      setNum(0);
-      reset();
-    }} />
-    
-    </View>
-
-
-  );
-  const gameView = (
-        <View style={styles.cbody}>  
-   
-    <Text style={styles.textcontainer}>{solution}</Text>
-    <Text style={styles.textcontainer}>{getresult}</Text>
-    <Text style={styles.textcontainer}>Hint: {gethint1}</Text>
-  
-    <Text style={styles.textcontainer}>Score: {getscore}</Text>
-    <Text style={styles.textcontainer}>Turn: {getturn}</Text>
-  
-
-  <View style={{}}>
-  <View style={{width:100}}><Button  title="reset" onPress={ onClick.bind(this,'reset')}/></View>
-   
-</View>
-  <View style={styles.viewcontainer}>
-
-    <View style={styles.buttoncontainer}><Button  title="1" onPress={ onClick.bind(this,'1')}/></View>
-    <View style={styles.buttoncontainer}><Button  title="2" onPress={onClick.bind(this,'2')}/></View>
-    <View style={styles.buttoncontainer}><Button  title="3" onPress={onClick.bind(this,'3')}/></View>
-  
-  </View>
-  
-  <View style={styles.viewcontainer}>
-    
-    <View style={styles.buttoncontainer}><Button  title="4" onPress={onClick.bind(this,'4')}/></View>  
-    <View style={styles.buttoncontainer}><Button  title="5" onPress={onClick.bind(this,'5')}/></View>
-    <View style={styles.buttoncontainer}><Button title="6" onPress={onClick.bind(this,'6')}/></View>
-  
-  </View>
-  
-  <View style={styles.viewcontainer}>
-  
-    <View style={styles.buttoncontainer}><Button  title="7" onPress={onClick.bind(this,'7')}/></View>
-    <View style={styles.buttoncontainer}><Button  title="8" onPress={onClick.bind(this,'8')}/></View>
-    <View style={styles.buttoncontainer}><Button  title="9" onPress={onClick.bind(this,'9')}/></View>
-     
-  </View>
-  
-  <View style={{flexDirection:"row", justifyContent:"space-between"}}>
-      <View style={styles.buttoncontainer}><Button  title="0" onPress={onClick.bind(this,'0')}/></View>
-      <View style={styles.buttoncontainer}><Button  title="h" onPress={hint1}/></View>
-      <View style={styles.buttoncontainer}><Button  title="=" onPress={onClick.bind(this,'=')}/></View>
-      
-</View>
-      </View>
-       );
-
+  }
+  //FOR COLUMNS
+  for(var j =0;j<n;j++){
+    sum=array[0][j]+array[1][j]+array[2][j];
+    if(sum==3){
+      return 1
+    }
+    else if(sum==-3){
+      return -1;
+    }
+}
+  //FOR DIAGONALS
+ sum=array[0][0]+array[1][1]+array[2][2];
+    if(sum==3){
+      return 1
+    }
+    else if(sum==-3){
+      return -1;
+    }
+   //FOR DIAGONALS
+ sum=array[0][2]+array[1][1]+array[2][0];
+    if(sum==3){
+      return 1
+    }
+    else if(sum==-3){
+      return -1;
+    }
+}
+  render(){
   return (
     <View style={styles.container}>
-      {getNum === GAME_START_MESSAGE ? message : getturn<5 ? gameView: end }
+    <Text style={{fontSize:20}}>Results</Text>
+     <View>{this.state.results}</View>
+     
+    <View style={{flexDirection:"row"}}>
+       <TouchableOpacity onPress={()=>this.onboardpress(0,0) } style={styles.board}>
+         {this.display(0,0)}
+       </TouchableOpacity>
+      
+       <TouchableOpacity onPress={()=>this.onboardpress(0,1) }style={styles.board}>
+          {this.display(0,1)}
+       </TouchableOpacity>
+       <TouchableOpacity onPress={()=>this.onboardpress(0,2) } style={styles.board}>
+         {this.display(0,2)}
+       </TouchableOpacity>
+      </View>
+
+       <View style={{flexDirection:"row"}}>
+      <TouchableOpacity onPress={()=>this.onboardpress(1,0) } style={styles.board}>
+            {this.display(1,0)}
+      </TouchableOpacity>
+      
+      <TouchableOpacity onPress={()=>this.onboardpress(1,1) }style={styles.board}>
+            {this.display(1,1)}
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={()=>this.onboardpress(1,2) } style={styles.board}>
+             {this.display(1,2)}
+       </TouchableOpacity>
+      </View>
+
+       <View style={{flexDirection:"row"}}>
+      <TouchableOpacity  onPress={()=>this.onboardpress(2,0) } style={styles.board}>
+            {this.display(2,0)}
+      </TouchableOpacity>
+      
+      <TouchableOpacity onPress={()=>this.onboardpress(2,1) }style={styles.board}>
+          {this.display(2,1)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onboardpress(2,2) }style={styles.board}>
+           {this.display(2,2)}
+     </TouchableOpacity>
+      </View>   
     </View>
   );
-  
 }
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    paddingTop: Constants.statusBarHeight,
     backgroundColor: '#ecf0f1',
     padding: 8,
   },
-  cbody:{
-  borderRadius:1,
-  borderColor:"black",
-  alignItems:"center",
-  },
-  textcontainer:{
-  padding:15,
-      textAlign:"center",
-      fontSize:20,
-  },
-  buttoncontainer:{
-    width:33
-  },
-  viewcontainer:{
-    flexDirection:"row", 
-    justifyContent:"space-between",
+board:{
+    borderWidth:1,
+    width:100,
+    height:100
   }
 });
